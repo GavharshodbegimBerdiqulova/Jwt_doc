@@ -1,0 +1,98 @@
+{
+  "info": {
+    "name": "Books API (JWT)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "base_url", "value": "http://127.0.0.1:8000"},
+    {"key": "access", "value": ""},
+    {"key": "refresh", "value": ""},
+    {"key": "book_id", "value": ""}
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{"key": "token", "value": "{{access}}", "type": "string"}]
+  },
+  "item": [
+    {
+      "name": "Register",
+      "request": {
+        "auth": {"type": "noauth"},
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {"mode": "raw", "raw": "{\n  \"username\": \"ali\",\n  \"password\": \"secret123\"\n}"},
+        "url": "{{base_url}}/api/register/"
+      }
+    },
+    {
+      "name": "Login (get tokens)",
+      "event": [{
+        "listen": "test",
+        "script": {"type": "text/javascript", "exec": [
+          "const data = pm.response.json();",
+          "pm.collectionVariables.set('access', data.access);",
+          "pm.collectionVariables.set('refresh', data.refresh);"
+        ]}
+      }],
+      "request": {
+        "auth": {"type": "noauth"},
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {"mode": "raw", "raw": "{\n  \"username\": \"ali\",\n  \"password\": \"secret123\"\n}"},
+        "url": "{{base_url}}/api/token/"
+      }
+    },
+    {
+      "name": "Refresh token",
+      "event": [{
+        "listen": "test",
+        "script": {"type": "text/javascript", "exec": [
+          "pm.collectionVariables.set('access', pm.response.json().access);"
+        ]}
+      }],
+      "request": {
+        "auth": {"type": "noauth"},
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {"mode": "raw", "raw": "{\n  \"refresh\": \"{{refresh}}\"\n}"},
+        "url": "{{base_url}}/api/token/refresh/"
+      }
+    },
+    {
+      "name": "Create book",
+      "event": [{
+        "listen": "test",
+        "script": {"type": "text/javascript", "exec": [
+          "pm.collectionVariables.set('book_id', pm.response.json().id);"
+        ]}
+      }],
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {"mode": "raw", "raw": "{\n  \"title\": \"O'tkan kunlar\",\n  \"author\": \"Abdulla Qodiriy\"\n}"},
+        "url": "{{base_url}}/api/books/"
+      }
+    },
+    {
+      "name": "List books",
+      "request": {"method": "GET", "url": "{{base_url}}/api/books/"}
+    },
+    {
+      "name": "Get book",
+      "request": {"method": "GET", "url": "{{base_url}}/api/books/{{book_id}}/"}
+    },
+    {
+      "name": "Update book",
+      "request": {
+        "method": "PUT",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {"mode": "raw", "raw": "{\n  \"title\": \"Mehrobdan chayon\",\n  \"author\": \"Abdulla Qodiriy\"\n}"},
+        "url": "{{base_url}}/api/books/{{book_id}}/"
+      }
+    },
+    {
+      "name": "Delete book",
+      "request": {"method": "DELETE", "url": "{{base_url}}/api/books/{{book_id}}/"}
+    }
+  ]
+}
